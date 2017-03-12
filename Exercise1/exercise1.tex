@@ -12,6 +12,7 @@
 \usepackage{graphicx}
 \usepackage{epstopdf} %converting to PDF
 \usepackage{subcaption}
+\usepackage{listings}
 
 \makeatletter
 
@@ -38,32 +39,174 @@
 	\author{{Lin Bai, 09935404}} %replace with your name
 	
 	\maketitle
-	
-	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-	%%%%%%   notations
-	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-	\section{Source Code}
-	Attached to this report.
 
 	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 	%%%%%%   question 1
 	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 	\section{Solution to question 1}
+	If negative item is removed, the result is shown bellow:
+	\lstset{language=R}
+	\lstset{frame=lines}
+	\lstset{caption={Filter out wrong education and gender}}
+	\lstset{label={lst:code_direct}}
+	\lstset{basicstyle=\footnotesize\ttfamily}
+	\begin{lstlisting}[breaklines=true]
+	# filter all negative value in education
+	educationDataFrame <- read.table("Education.txt", header=TRUE, sep="")
+	
+	iter = 1
+	val = 1
+	data_length = length(educationDataFrame$ID)
+	
+	while(iter <= data_length)
+	{
+		# filter wrong education & gender
+		if (educationDataFrame$Education[val]<0)
+		{
+			educationDataFrame = educationDataFrame[-c(val), ]
+		}
+		else if (educationDataFrame$Gender[val] != 1 & educationDataFrame$Gender[val] != 2)
+		{
+			educationDataFrame = educationDataFrame[-c(val), ]
+		}
+		else
+			val = val + 1
+	
+		iter = iter + 1
+	}
+	\end{lstlisting}
+	
+	To get the mean, the median, the standard deviation, the minimum and maximum value.
+	\lstset{caption={Summary of each variable}}
+	\begin{lstlisting}[breaklines=true]
+		summary(educationDataFrame)
+		
+		sd(educationDataFrame$Education)
+		sd(educationDataFrame$Gender)
+		sd(educationDataFrame$Wage)
+		sqrt(mean(educationDataFrame$Education^2) - mean(educationDataFrame$Education)^2)
+		sqrt(mean(educationDataFrame$Gender^2) - mean(educationDataFrame$Gender)^2)
+		sqrt(mean(educationDataFrame$Wage^2) - mean(educationDataFrame$Wage)^2)
+	\end{lstlisting}
+	\begin{table}[htbp]
+		\centering
+		\label{my-label}
+		\begin{tabular}{l|l|l|l|l|l|l}
+			\hline
+			          & mean   & median & minimum & maximum & sample sd & population sd \\
+			\hline
+			education & 14.26  & 5.00   & 14.00   & 22.00   & 2.912     & 2.909\\
+			\hline
+			gender    & 1.4    & 1.0    & 1.0     & 2.0     & 0.490     & 0.490\\
+			\hline
+			wage      & 5468.4 & 5515.7 & 41.8    & 8453.5  & 1223.807  & 1222.578\\
+			\hline
+		\end{tabular}
+	\end{table}
 	
 	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 	%%%%%%   question 2
 	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 	\section{Solution to question 2}
+	\subsection{Country: US}
+	\lstset{caption={US}}
+	\begin{lstlisting}[breaklines=true]
+		usSub<-subset(educationDataFrame, educationDataFrame$Country=="US")
+		usDataFrame<-subset(usSub, usSub$Education>0 & (usSub$Gender==1 | usSub$Gender==2))
+		summary(usDataFrame)
+	\end{lstlisting}
+		\begin{table}[htbp]
+		\centering
+		\label{my-label}
+		\begin{tabular}{l|l|l|l|l|l|l}
+			\hline
+			          & mean   & median & minimum & maximum & sample sd & population sd \\
+			\hline
+			education & 14.19  & 14.00   & 8.00    & 21.00   & 2.782     & 2.777\\
+			\hline
+			gender    & 1.396  & 1.0    & 1.0     & 2.0     & 0.490     & 0.4890\\
+			\hline
+			wage      & 5459   & 5447   & 2938    & 8110    & 1169.657  & 1167.693\\
+			\hline
+		\end{tabular}
+	\end{table}
+
 	
+	\subsection{Country: Canda}
+	\lstset{caption={Canda}}
+	\begin{lstlisting}[breaklines=true]
+		caSub<-subset(educationDataFrame, educationDataFrame$Country=="Canada")
+		caDataFrame<-subset(caSub, caSub$Education>0 & (caSub$Gender==1 | caSub$Gender==2))
+		summary(caDataFrame)
+	\end{lstlisting}
+	\begin{table}[htbp]
+		\centering
+		\label{my-label}
+		\begin{tabular}{l|l|l|l|l|l|l}
+			\hline
+			          & mean   & median & minimum & maximum & sample sd & population sd \\
+			\hline
+			education & 14.36  & 14.00  & 5.00    & 22.00   & 3.100    & 3.092\\
+			\hline
+			gender    & 1.405  & 1.0    & 1.0     & 2.0     & 0.492     & 0.491\\
+			\hline
+			wage      & 5482.1 & 5634.2 & 41.8    & 8453.5  & 1303.207  & 1299.945\\
+			\hline
+		\end{tabular}
+	\end{table}
 	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 	%%%%%%   question 3
 	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 	\section{Solution to question 3}
-	
+	From the calculation in last section. We could find, the minimum wage is Canada is lower than US, while the maximum wage in Canada is higher then that in US. Since the standard derivation in Canada is about 200 higher than that in US, we could say the wage in US has less difference between each other.\\
 	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 	%%%%%%   question 4
 	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 	\section{Solution to question 4}
+	\subsection{male}
+	\lstset{caption={male}}
+	\begin{lstlisting}[breaklines=true]
+		maleSub<-subset(educationDataFrame, educationDataFrame$Gender=="1")
+		maleDataFrame<-subset(maleSub, maleSub$Education>0 & (maleSub$Gender==1 | maleSub$Gender==2))
+		summary(maleDataFrame)
+	\end{lstlisting}
+	\begin{table}[htbp]
+		\centering
+		\label{my-label}
+		\begin{tabular}{l|l|l|l|l|l|l}
+			\hline
+			          & mean   & median & minimum & maximum & sample sd & population sd \\
+			\hline
+			education & 14.26  & 14.00  & 5.00    & 21.00   & 2.941     & 2.936\\
+			\hline
+			wage      & 5730   & 5730   & 2047    & 8454    & 1168.759  & 1166.802\\
+			\hline
+		\end{tabular}
+	\end{table}
+
+	\subsection{female}
+	\lstset{caption={male}}
+	\begin{lstlisting}[breaklines=true]
+		femaleSub<-subset(educationDataFrame, educationDataFrame$Gender=="2")
+		femaleDataFrame<-subset(femaleSub, femaleSub$Education>0 & (femaleSub$Gender==1 | femaleSub$Gender==2))
+		summary(femaleDataFrame)
+	\end{lstlisting}
+	\begin{table}[htbp]
+	\centering
+	\label{my-label}
+	\begin{tabular}{l|l|l|l|l|l|l}
+		\hline
+	              & mean   & median & minimum & maximum & sample sd & population sd \\
+		\hline
+		education & 14.25  & 14.00  & 8.00    & 22.00   & 2.874     & 2.867\\
+		\hline
+		wage      & 5074.9 & 4951.9 & 41.8    & 8329    & 1201.782  & 1198.759\\
+		\hline
+	\end{tabular}
+	\end{table}
+	\noindent
+	From the result above, we could find, both the min. and max. education year of female is larger then that of male. And less difference in education year among female. Concerning to the wage, female has higher average wave but larger difference among female.\\
+	
 
 	
 	% --------------------------------------------------------------
