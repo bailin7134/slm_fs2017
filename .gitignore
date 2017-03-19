@@ -1,4 +1,4 @@
-*/*.pdf
+*/solution*.pdf
 */*.aux
 */*.log
 */*.synctex.gz
