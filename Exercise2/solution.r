@@ -6,7 +6,7 @@ carseatDataFrame$Color[carseatDataFrame$Price>180] = 'red'
 carseatDataFrame$Color[carseatDataFrame$Price<40] = 'red'
 carseatDataFrame$Color[carseatDataFrame$Sales>18] = 'red'
 
-plot(carseatDataFrame$Sales, carseatDataFrame$Price, main = "Car seats Sales-Price Plot", xlab = "Sales", ylab = "Price", color = carseatDataFrame$Color)
+plot(carseatDataFrame$Sales, carseatDataFrame$Price, main = "Car seats Sales-Price Plot", xlab = "Sales", ylab = "Price", col = carseatDataFrame$Color)
 
 # Q2:
 educationDataFrame <- read.table("Education.txt", header=TRUE, sep="")
