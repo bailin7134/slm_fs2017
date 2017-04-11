@@ -1,0 +1,173 @@
+% --------------------------------------------------------------
+% This is all preamble stuff that you don't have to worry about.
+% Head down to where it says "Start here"
+% --------------------------------------------------------------
+
+\documentclass[12pt]{article}
+
+\usepackage[margin=1in]{geometry} 
+\usepackage{amsmath,amsthm,amssymb}
+\usepackage{color}
+%\usepackage{tikz, pgfplots}
+\usepackage{graphicx}
+\usepackage{epstopdf} %converting to PDF
+\usepackage{subcaption}
+\usepackage{listings}
+
+\makeatletter
+
+\renewcommand\section{\@startsection {section}{1}{\z@}%
+	{-3.5ex \@plus -1ex \@minus -.2ex}%
+	{2.3ex \@plus.2ex}%
+	{\normalfont\large\bfseries}}% from \Large
+\renewcommand\subsection{\@startsection{subsection}{2}{\z@}%
+	{-3.25ex\@plus -1ex \@minus -.2ex}%
+	{1.5ex \@plus .2ex}%
+	{\normalfont\large\bfseries}}% from \large
+\makeatother
+
+\begin{document}
+	
+	% --------------------------------------------------------------
+	%                         Start here
+	% --------------------------------------------------------------
+	
+	%\renewcommand{\qedsymbol}{\filledbox}
+	
+	\title{\textbf{Statistical Learning Methods Exercise \#{4}}\\
+	Universit{\'e} de Neuch\^{a}tel}%replace X with the appropriate number
+	\author{{Lin Bai, 09935404}} %replace with your name
+	
+	\maketitle
+
+	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+	%%%%%%   question 1
+	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+	\section{Solution to question 1}
+	\begin{figure}[htbp]
+		\centering
+		\includegraphics[width=0.75\textwidth]{q1.eps}
+		\caption{education wage plot}
+	\end{figure}
+	\noindent
+	conclusion:\\
+	the wage is a linear function of eduction for both male and female.\\
+	the linear model for male is: wage = education * 398.5 + 24\\
+	the linear model for female is:	wage = eduction * 397.5 - 563.5\\
+	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+	%%%%%%   question 2
+	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+	\section{Solution to question 2}
+	Vendor name and model names have no relation to the system performance, therefore both of them are not able to be the predictive values.\\
+	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+	%%%%%%   question 3
+	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+	\section{Solution to question 3}
+	From the Summary Statistics, MMAX has the maximum PRP Correlation value. Therefore, MMAX is the variable which is chosen.\\
+	\begin{table}[htbp]
+		\centering
+		\caption{table for question 3}
+		\label{q3_table}
+		\begin{tabular}{|l|l|l|}
+			\hline
+			      & Multiple R-squared & F-statistic\\
+			\hline
+			MYTC  & 0.09431            & 21.56 \\
+			\hline
+			MMIN  & 0.6319             & 355.4 \\
+			\hline
+			MMAX  & 0.7448             & 604.1 \\
+			\hline
+			CACH  & 0.4391             & 162 \\
+			\hline
+			CGMIN & 0.3708             & 122 \\
+			\hline
+			CHMAX & 0.3663             & 119.6\\
+			\hline
+		\end{tabular}
+	\end{table}
+	\noindent
+	\\
+	From the multiple R-squared and F-statistic result, MMAX also has the biggest value.\\
+	The confident interval is (-49.773, -18.226)
+	\lstset{language=R}
+	\lstset{frame=lines}
+	\lstset{label={lst:code_direct}}
+	\lstset{basicstyle=\footnotesize\ttfamily}
+	\begin{lstlisting}[breaklines=true]
+	> confint(mld)
+	              2.5 %    97.5 %
+	(Intercept) -49.77265640 -18.22582429
+	MMAX          0.01088673   0.01278561
+	\end{lstlisting}
+	\newpage
+	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+	%%%%%%   question 4
+	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+	\section{Solution to question 4}
+	\begin{figure}[htbp]
+		\centering
+		\includegraphics[width=0.75\textwidth]{q4.eps}
+		\caption{plot for question 4}
+	\end{figure}
+	%\noindent
+	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+	%%%%%%   question 5
+	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+	\section{Solution to question 5}
+	Among all the variables, $name$ and $origin$ are not able to used to explain $mpg$, since they contribute nothing to the $mpg$.\\
+	The rest ones, like $cylinders$, $displacement$, $horsepower$, $weight$, $acceleration$ and $year$ have relation to the $mpg$.\\
+	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+	%%%%%%   question 6
+	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+	\section{Solution to question 6}
+	To choose the variable, linear model between $mpg$ and all other variables are built.
+	\begin{table}[htbp]
+		\centering
+		\caption{table for question 6}
+		\label{q3_table}
+		\begin{tabular}{|l|l|l|}
+			\hline
+			             & Multiple R-squared & F-statistic\\
+			\hline
+			cylinders    & 0.6012             & 597.1 \\
+			\hline
+			displacement & 0.6467             & 725 \\
+			\hline
+			horsepower   & 0.6059             & 599.7 \\
+			\hline
+			weight       & 0.6918             & 888.9 \\
+			\hline
+			acceleration & 0.1766             & 84.96 \\
+			\hline
+			year         & 0.3356             & 200 \\
+			\hline
+		\end{tabular}
+	\end{table}
+	\noindent
+	\\
+	$weight$ has the largest value in both multiply R-squared and F-statistic. So $weight$ is the one can be chosen to explain $mpg$.\\
+	\lstset{language=R}
+	\lstset{frame=lines}
+	\lstset{label={lst:code_direct}}
+	\lstset{basicstyle=\footnotesize\ttfamily}
+	\begin{lstlisting}[breaklines=true]
+	> confint(summaryMld)
+	                2.5 %       97.5 %
+	(Intercept) 44.753934082 47.880794759
+	weight      -0.008182822 -0.007170398
+	\end{lstlisting}
+	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+	%%%%%%   question 7
+	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+	\section{Solution to question 7}
+	\begin{figure}[htbp]
+		\centering
+		\includegraphics[width=0.74\textwidth]{q7.eps}
+		\caption{plot for question 7}
+	\end{figure}
+	% --------------------------------------------------------------
+	%     You don't have to mess with anything below this line.
+	% --------------------------------------------------------------
+	
+\end{document}
