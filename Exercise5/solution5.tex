@@ -1,0 +1,187 @@
+% --------------------------------------------------------------
+% This is all preamble stuff that you don't have to worry about.
+% Head down to where it says "Start here"
+% --------------------------------------------------------------
+
+\documentclass[12pt]{article}
+
+\usepackage[margin=1in]{geometry} 
+\usepackage{amsmath,amsthm,amssymb}
+\usepackage{color}
+%\usepackage{tikz, pgfplots}
+\usepackage{graphicx}
+\usepackage{epstopdf} %converting to PDF
+\usepackage{subcaption}
+\usepackage{listings}
+
+\makeatletter
+
+\renewcommand\section{\@startsection {section}{1}{\z@}%
+	{-3.5ex \@plus -1ex \@minus -.2ex}%
+	{2.3ex \@plus.2ex}%
+	{\normalfont\large\bfseries}}% from \Large
+\renewcommand\subsection{\@startsection{subsection}{2}{\z@}%
+	{-3.25ex\@plus -1ex \@minus -.2ex}%
+	{1.5ex \@plus .2ex}%
+	{\normalfont\large\bfseries}}% from \large
+\makeatother
+
+\begin{document}
+	
+	% --------------------------------------------------------------
+	%                         Start here
+	% --------------------------------------------------------------
+	
+	%\renewcommand{\qedsymbol}{\filledbox}
+	
+	\title{\textbf{Statistical Learning Methods Exercise \#{5}}\\
+	Universit{\'e} de Neuch\^{a}tel}%replace X with the appropriate number
+	\author{{Lin Bai, 09935404}} %replace with your name
+	
+	\maketitle
+
+	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+	%%%%%%   question 1
+	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+	\section{Solution to question 1}
+	The multiple R-squared is 0.9931, which means the variables "Education" and "Gender" have a strong relation to "Wage".\\
+	
+	\lstset{language=R}
+	\lstset{frame=lines}
+	\lstset{label={lst:code_direct}}
+	\lstset{basicstyle=\footnotesize\ttfamily}
+	\begin{lstlisting}[breaklines=true]
+		Call:
+		lm(formula = Wage ~ Education + Gender, data = eduData)
+	 
+		Residuals:
+		  Min       1Q      Median    3Q      Max 
+		-243.473  -76.073    0.354   73.126  280.275 
+	 
+		Coefficients:
+		            Estimate  Std. Error  t value Pr(>|t|)    
+		(Intercept) -569.784     23.100  -24.67   <2e-16 ***
+		Education    397.975      1.543  258.00   <2e-16 ***
+		Gendermale   597.904      9.173   65.18   <2e-16 ***
+		---
+		Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+	 
+		Residual standard error: 100.1 on 494 degrees of freedom
+		Multiple R-squared:  0.9931,	Adjusted R-squared:  0.9931 
+		F-statistic: 3.544e+04 on 2 and 494 DF,  p-value: < 2.2e-16
+	\end{lstlisting}
+	%\begin{figure}[htbp]
+	%	\centering
+	%	\includegraphics[width=0.75\textwidth]{q1.eps}
+	%	\caption{education wage plot}
+	%\end{figure}
+	\newpage
+	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+	%%%%%%   question 2
+	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+	\section{Solution to question 2}
+	\subsection{Question 2-1}
+	parameters "vendor" and "model" are not suitable to predict performance.
+	\subsection{Question 2-2}
+	\lstset{language=R}
+	\lstset{frame=lines}
+	\lstset{label={lst:code_direct}}
+	\lstset{basicstyle=\footnotesize\ttfamily}
+	\begin{lstlisting}[breaklines=true]
+		Call:
+		lm(formula = PRP ~ MYCT + MMIN + MMAX + CACH + CGMIN + CHMAX, 
+		data = pcData)
+	
+		Residuals:
+		  Min      1Q     Median   3Q     Max 
+		-195.82  -25.17    5.40   26.52  385.75 
+	 
+		Coefficients:
+	                 Estimate   Std. Error t value Pr(>|t|)    
+		(Intercept) -5.589e+01  8.045e+00  -6.948 5.00e-11 ***
+		MYCT         4.885e-02  1.752e-02   2.789   0.0058 ** 
+		MMIN         1.529e-02  1.827e-03   8.371 9.42e-15 ***
+		MMAX         5.571e-03  6.418e-04   8.681 1.32e-15 ***
+		CACH         6.414e-01  1.396e-01   4.596 7.59e-06 ***
+		CGMIN       -2.704e-01  8.557e-01  -0.316   0.7524    
+		CHMAX        1.482e+00  2.200e-01   6.737 1.65e-10 ***
+		---
+		Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+	 
+		Residual standard error: 59.99 on 202 degrees of freedom
+		Multiple R-squared:  0.8649,	Adjusted R-squared:  0.8609 
+		F-statistic: 215.5 on 6 and 202 DF,  p-value: < 2.2e-16
+	\end{lstlisting}
+	\subsection{Question 2-3}
+	Parameter "MYCT" and "CGMIN" have very little contribution on the model we build.
+	\subsection{Question 2-4}
+	The method is:\\
+	1. get the adjusted R square for each parameter\\
+	2. choose the parameter with biggest adjusted R square to build the model\\
+	3. add one of the not used parameters to the model and check the adjusted R square of
+	new model, if none of them is greater than the reference model, then stop. Otherwise, 
+	choose current model as reference model\\
+	3. re-run step 2 until it stops.
+	\subsection{Question 2-5}
+	$Pr(>|t|)$ demonstrates how strong each parameter has influence on the final model\\
+	Multiple R-squared shows how good the model is to predict the performance
+	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+	%%%%%%   question 3
+	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+	\section{Solution to question 3}
+	As shown in the figures, the outliers are No. 10, No. 32, No. 200.\\
+	\begin{figure}[htbp]
+		\centering
+		\includegraphics[width=0.75\textwidth]{3-1.eps}
+		\caption{education wage plot}
+	\end{figure}
+	\newpage
+	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+	%%%%%%   question 4
+	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+	\section{Solution to question 4}
+	Repeat the Question 2 and 3\\
+	
+	\lstset{language=R}
+	\lstset{frame=lines}
+	\lstset{label={lst:code_direct}}
+	\lstset{basicstyle=\footnotesize\ttfamily}
+	\begin{lstlisting}[breaklines=true]
+		Call:
+		lm(formula = mpg ~ weight + year + horsepower + acceleration + 
+		    displacement + cylinders, data = carData)
+		
+		Residuals:
+		    Min      1Q  Median      3Q     Max 
+		-8.6927 -2.3864 -0.0801  2.0291 14.3607 
+		
+		Coefficients:
+					   Estimate Std. Error t value Pr(>|t|)    
+		(Intercept)  -1.454e+01  4.764e+00  -3.051  0.00244 ** 
+		weight       -6.795e-03  6.700e-04 -10.141  < 2e-16 ***
+		year          7.534e-01  5.262e-02  14.318  < 2e-16 ***
+		horsepower   -3.914e-04  1.384e-02  -0.028  0.97745    
+		acceleration  8.527e-02  1.020e-01   0.836  0.40383    
+		displacement  7.678e-03  7.358e-03   1.044  0.29733    
+		cylinders    -3.299e-01  3.321e-01  -0.993  0.32122    
+		---
+		Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+		
+		Residual standard error: 3.435 on 385 degrees of freedom
+		  (6 observations deleted due to missingness)
+		Multiple R-squared:  0.8093,	Adjusted R-squared:  0.8063 
+		F-statistic: 272.2 on 6 and 385 DF,  p-value: < 2.2e-16
+	\end{lstlisting}
+	\noindent
+	\\
+	As shown in the figures, the outliers are No. 323, No. 326, No. 327.\\
+	\begin{figure}[htbp]
+		\centering
+		\includegraphics[width=0.75\textwidth]{5-1.eps}
+		\caption{education wage plot}
+	\end{figure}
+	% --------------------------------------------------------------
+	%     You don't have to mess with anything below this line.
+	% --------------------------------------------------------------
+	
+\end{document}
