@@ -1,7 +1,7 @@
 # single regression
 myData <- read.table("ComputerData.txt", header=T)
-#subset < !(is.na(myData["MYCT","MMIN","MMAX","CACH","CGMIN","CHMAX","PRP"]))
-usefulData <- myData[c("MYCT","MMIN","MMAX","CACH","CGMIN","CHMAX")]
+#subset < !(is.na(myData["MYCT","MMIN","MMAX","CACH","CGMIN","CHMAX"]))
+usefulData <- myData[c("MYCT","MMIN","MMAX","CACH","CGMIN","CHMAX","PRP")]
 attach(usefulData)
 #set.seed(123)
 #train <- sample(209,104)
