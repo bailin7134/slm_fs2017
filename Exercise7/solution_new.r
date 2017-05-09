@@ -31,10 +31,10 @@ attach(usefulData)
 library(boot)
 set.seed(123)
 cv.errorSigReg <- rep(0,10)
+cv.trainMse <- rep(0,10)
 for (i in 1:10) {
   glm.mod <- glm(PRP~poly(MMAX,i), data=usefulData)
-  sm <-summary(glm.mod)
-  sm$residuals
+  cv.trainMse[i] <- sum((glm.mod$residuals)^2)
   cv.errorSigReg[i] <- cv.glm(usefulData,glm.mod,K=10)$delta[2]
 }
 # test MSE
@@ -44,8 +44,10 @@ cv.errorSigReg
 library(boot)
 set.seed(123)
 cv.errorMulReg <- rep(0,10)
+cv.trainMse <- rep(0,10)
 for (i in 1:10) {
   glm.mod <- glm(PRP~poly(MYCT + MMIN + MMAX + CACH + CGMIN + CHMAX,i), data=usefulData)
+  cv.trainMse[i] <- sum((glm.mod$residuals)^2)
   cv.errorMulReg[i] <- cv.glm(usefulData,glm.mod,K=10)$delta[2]
 }
 cv.errorMulReg
@@ -60,3 +62,5 @@ cv.errorMulReg
 preKnn <- knn.cv(usefulData, usefulData$PRP, k = 1, prob = FALSE)
 preKnn <- as.numeric(as.character(preKnn))
 mseKnn <- sum((preKnn - usefulData$PRP)^2)/length(preKnn)
+
+computer.knn = knn.reg(usefulData, test = NULL, y = PRP, k = 2)
