@@ -10,7 +10,7 @@ usefulData = (usefulData - means) / sd
 summary(usefulData)
 attach(usefulData)
 
-# model 1: simple linear regressionlibrary(boot)
+# model 1: simple linear regression
 library(boot)
 set.seed(123)
 print("signle regression time")
@@ -29,9 +29,12 @@ for (i in 1:10) {
 }
 cv.errorPolyReg
 # the best model is i=2
+glm.mod3 <- glm(mpg~poly(weight,2), data=usefulData)
 
 # t-test
-
+t.test(predict(glm.mod1),usefulData$mpg)
+t.test(predict(glm.mod2),usefulData$mpg)
+t.test(predict(glm.mod3),usefulData$mpg)
 
 # Q2:
 cancerData <- read.table("Cancer.txt",header=T,sep="")
