@@ -13,33 +13,22 @@ attach(usefulData)
 # model 1: simple linear regressionlibrary(boot)
 library(boot)
 set.seed(123)
-cv.errorSigReg <- rep(0,10)
 print("signle regression time")
 glm.mod1 <- glm(mpg~weight, data=usefulData)
 cv.errorSigReg <- cv.glm(usefulData,glm.mod1,K=10)$delta[2]
-for (i in 1:10) {
-  glm.mod1 <- glm(mpg~poly(weight,i), data=usefulData)
-  cv.errorSigReg[i] <- cv.glm(usefulData,glm.mod1,K=10)$delta[2]
-}
 cv.errorSigReg
-# model 2: multiple linear regression
-library(boot)
-set.seed(123)
-cv.errorMul1Reg <- rep(0,10)
-for (i in 1:10) {
-  glm.mod2 <- glm(mpg~poly(weight+year+horsepower,i), data=usefulData)
-  cv.errorMul1Reg[i] <- cv.glm(usefulData,glm.mod2,K=10)$delta[2]
-}
+# model 2: multi linear regression
+glm.mod2 <- glm(mpg~weight+year+horsepower+acceleration+displacement+cylinders, data=usefulData)
+cv.errorMul1Reg <- cv.glm(usefulData,glm.mod2,K=10)$delta[2]
 cv.errorMul1Reg
 # model 3: multiple linear regression
-library(boot)
-set.seed(123)
-cv.errorMul2Reg <- rep(0,10)
+cv.errorPolyReg <- rep(0,10)
 for (i in 1:10) {
-  glm.mod3 <- glm(mpg~poly(weight+year+horsepower+acceleration+displacement+cylinders,i), data=usefulData)
-  cv.errorMul2Reg[i] <- cv.glm(usefulData,glm.mod3,K=10)$delta[2]
+  glm.mod3 <- glm(mpg~poly(weight,i), data=usefulData)
+  cv.errorPolyReg[i] <- cv.glm(usefulData,glm.mod3,K=10)$delta[2]
 }
-cv.errorMul2Reg
+cv.errorPolyReg
+# the best model is i=2
 
 # t-test
 
@@ -53,6 +42,7 @@ predictors = names(usefulData)
 means = lapply(usefulData, mean)
 sd = lapply(usefulData, sd)
 usefulData = (usefulData - means) / sd
+#featData = usefulData
 usefulData[, "Diagnostic"] = cancerData[, "Diagnostic"]
 summary(usefulData)
 attach(usefulData)
@@ -64,6 +54,11 @@ summary(glm.mod)
 
 glm.mod <- glm(Diagnostic~Texture, data=usefulData, family=binomial)
 summary(glm.mod)
+glm.probs <- predict(glm.mod, type="response")
+glm.pred = rep("B",dim(usefulData)[1])
+glm.pred[glm.probs >.5] = "M"
+table(glm.pred,Diagnostic)
+mean(glm.pred==Diagnostic)
 
 # Q3:
 vertebralData <- read.table("VertebralData.2C.txt",header=T,sep=",")
@@ -80,6 +75,17 @@ summary(usefulData)
 attach(usefulData)
 glm.mod <- glm(Status~Incidence+Tilt+Angle+Slope+Radius+Degree, data=usefulData, family=binomial)
 summary(glm.mod)
+glm.probs <- predict(glm.mod, type="response")
+contrasts(Status)
+glm.pred = rep("Abnormal",dim(usefulData)[1])
+glm.pred[glm.probs >.5] = "Normal"
+table(glm.pred,Status)
+mean(glm.pred==Status)
+# error rate is 0.8483871
+
 library(MASS)
-lda.fit=lda(Status~Incidence+Tilt+Angle+Slope+Radius+Degree, data=usefulData)
-lda.fit
+lda.mod=lda(Status~Incidence+Tilt+Angle+Slope+Radius+Degree, data=usefulData)
+summary(lda.mod)
+lda.probs <- predict(lda.mod, type="response")
+mean(lda.pred==Status)
+# error rate is 0.6774194
