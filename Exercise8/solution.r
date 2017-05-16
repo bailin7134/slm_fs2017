@@ -10,31 +10,40 @@ usefulData = (usefulData - means) / sd
 summary(usefulData)
 attach(usefulData)
 
+trainSize <- floor(0.8*nrow(usefulData))
+set.seed(123)
+trainIndex <- sample(seq_len(nrow(usefulData)), size=trainSize)
+trainSet <- usefulData[trainIndex,]
+testSet <- usefulData[-trainIndex,]
+
+
 # model 1: simple linear regression
 library(boot)
-set.seed(123)
 print("signle regression time")
-glm.mod1 <- glm(mpg~weight, data=usefulData)
-cv.errorSigReg <- cv.glm(usefulData,glm.mod1,K=10)$delta[2]
+glm.mod1 <- glm(mpg~weight, data=trainSet)
+cv.errorSigReg <- cv.glm(trainSet,glm.mod1,K=10)$delta[2]
 cv.errorSigReg
 # model 2: multi linear regression
-glm.mod2 <- glm(mpg~weight+year+horsepower+acceleration+displacement+cylinders, data=usefulData)
-cv.errorMul1Reg <- cv.glm(usefulData,glm.mod2,K=10)$delta[2]
+glm.mod2 <- glm(mpg~weight+year+horsepower+acceleration+displacement+cylinders, data=trainSet)
+cv.errorMul1Reg <- cv.glm(trainSet,glm.mod2,K=10)$delta[2]
 cv.errorMul1Reg
 # model 3: multiple linear regression
 cv.errorPolyReg <- rep(0,10)
 for (i in 1:10) {
-  glm.mod3 <- glm(mpg~poly(weight,i), data=usefulData)
-  cv.errorPolyReg[i] <- cv.glm(usefulData,glm.mod3,K=10)$delta[2]
+  glm.mod3 <- glm(mpg~poly(weight,i), data=trainSet)
+  cv.errorPolyReg[i] <- cv.glm(trainSet,glm.mod3,K=10)$delta[2]
 }
 cv.errorPolyReg
 # the best model is i=2
-glm.mod3 <- glm(mpg~poly(weight,2), data=usefulData)
+glm.mod3 <- glm(mpg~poly(weight,2), data=trainSet)
 
 # t-test
-t.test(predict(glm.mod1),usefulData$mpg)
-t.test(predict(glm.mod2),usefulData$mpg)
-t.test(predict(glm.mod3),usefulData$mpg)
+summary(glm.mod1)
+summary(glm.mod2)
+summary(glm.mod3)
+t.test(predict(glm.mod1, data=testSet),testSet$mpg,paried=T)
+t.test(predict(glm.mod2, data=testSet),testSet$mpg)
+t.test(predict(glm.mod3, data=testSet),testSet$mpg)
 
 # Q2:
 cancerData <- read.table("Cancer.txt",header=T,sep="")
@@ -84,11 +93,13 @@ glm.pred = rep("Abnormal",dim(usefulData)[1])
 glm.pred[glm.probs >.5] = "Normal"
 table(glm.pred,Status)
 mean(glm.pred==Status)
-# error rate is 0.8483871
+# correct rate is 0.8483871
 
 library(MASS)
 lda.mod=lda(Status~Incidence+Tilt+Angle+Slope+Radius+Degree, data=usefulData)
 summary(lda.mod)
 lda.probs <- predict(lda.mod, type="response")
+lda.pred = unlist(lda.probs[1])
+table(lda.pred,Status)
 mean(lda.pred==Status)
-# error rate is 0.6774194
+# correct rate is 0.6774194

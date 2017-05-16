@@ -1,0 +1,338 @@
+% --------------------------------------------------------------
+% This is all preamble stuff that you don't have to worry about.
+% Head down to where it says "Start here"
+% --------------------------------------------------------------
+
+\documentclass[12pt]{article}
+
+\usepackage[margin=1in]{geometry} 
+\usepackage{amsmath,amsthm,amssymb}
+\usepackage{color}
+%\usepackage{tikz, pgfplots}
+\usepackage{graphicx}
+\usepackage{epstopdf} %converting to PDF
+\usepackage{subcaption}
+\usepackage{listings}
+
+\makeatletter
+
+\renewcommand\section{\@startsection {section}{1}{\z@}%
+	{-3.5ex \@plus -1ex \@minus -.2ex}%
+	{2.3ex \@plus.2ex}%
+	{\normalfont\large\bfseries}}% from \Large
+\renewcommand\subsection{\@startsection{subsection}{2}{\z@}%
+	{-3.25ex\@plus -1ex \@minus -.2ex}%
+	{1.5ex \@plus .2ex}%
+	{\normalfont\large\bfseries}}% from \large
+\makeatother
+
+\begin{document}
+	
+	% --------------------------------------------------------------
+	%                         Start here
+	% --------------------------------------------------------------
+	
+	%\renewcommand{\qedsymbol}{\filledbox}
+	
+	\title{\textbf{Statistical Learning Methods Exercise \#{8}}\\
+	Universit{\'e} de Neuch\^{a}tel}%replace X with the appropriate number
+	\author{{Lin Bai, 09935404}} %replace with your name
+	
+	\maketitle
+
+	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+	%%%%%%   question 1
+	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+	\section{Solution to question 1}
+	\subsection{}
+	Three linear regression models, single linear regression, multi linear regression and one using polynomial.\\
+	\lstset{language=R}
+	\lstset{frame=lines}
+	\lstset{label={lst:code_direct}}
+	\lstset{basicstyle=\footnotesize\ttfamily}
+	\begin{lstlisting}[breaklines=true]
+	carData <- read.table("Cars2Data.txt",header=T,sep="")
+	# useful data extraction
+	usefulData = carData[, c("mpg", "cylinders", "displacement", "horsepower", "weight", "acceleration", "year")]
+	usefulData<-subset(usefulData, horsepower>0)
+	predictors = names(usefulData)
+	# Standardized the values
+	means = lapply(usefulData, mean)
+	sd = lapply(usefulData, sd)
+	usefulData = (usefulData - means) / sd
+	summary(usefulData)
+	attach(usefulData)
+	
+	trainSize <- floor(0.8*nrow(usefulData))
+	set.seed(123)
+	trainIndex <- sample(seq_len(nrow(usefulData)), size=trainSize)
+	trainSet <- usefulData[trainIndex,]
+	testSet <- usefulData[-trainIndex,]
+	
+	
+	# model 1: simple linear regression
+	library(boot)
+	print("signle regression time")
+	glm.mod1 <- glm(mpg~weight, data=trainSet)
+	cv.errorSigReg <- cv.glm(trainSet,glm.mod1,K=10)$delta[2]
+	cv.errorSigReg
+	# model 2: multi linear regression
+	glm.mod2 <- glm(mpg~weight+year+horsepower+acceleration+displacement+cylinders, data=trainSet)
+	cv.errorMul1Reg <- cv.glm(trainSet,glm.mod2,K=10)$delta[2]
+	cv.errorMul1Reg
+	# model 3: multiple linear regression
+	cv.errorPolyReg <- rep(0,10)
+	for (i in 1:10) {
+		glm.mod3 <- glm(mpg~poly(weight,i), data=trainSet)
+		cv.errorPolyReg[i] <- cv.glm(trainSet,glm.mod3,K=10)$delta[2]
+	}
+	cv.errorPolyReg
+	# the best model is i=2
+	glm.mod3 <- glm(mpg~poly(weight,2), data=trainSet)
+	\end{lstlisting}
+	When using polynomial as predictors, weight's square gives the lowest error.\\
+	\subsection{}
+	10-fold cross validation is also run in above code. The test errors are 0.3084253, 0.1957458 and 0.2868424 for single, multi and polynomial respectively.\\
+	\subsection{}
+	T-test results are shown below, p-values are not as small as we could accept the hypothesis.\\
+	\lstset{language=R}
+	\lstset{frame=lines}
+	\lstset{label={lst:code_direct}}
+	\lstset{basicstyle=\footnotesize\ttfamily}
+	\begin{lstlisting}[breaklines=true]
+	> t.test(predict(glm.mod1, data=testSet),testSet$mpg)
+	
+	Welch Two Sample t-test
+	
+	data:  predict(glm.mod1, data = testSet) and testSet$mpg
+	t = 0.9135, df = 117.62, p-value = 0.3628
+	alternative hypothesis: true difference in means is not equal to 0
+	95 percent confidence interval:
+	-0.1181945  0.3206087
+	sample estimates:
+	mean of x   mean of y 
+	0.02039632 -0.08081075 
+	
+	> t.test(predict(glm.mod2, data=testSet),testSet$mpg)
+	
+	Welch Two Sample t-test
+	
+	data:  predict(glm.mod2, data = testSet) and testSet$mpg
+	t = 0.89964, df = 124.43, p-value = 0.3701
+	alternative hypothesis: true difference in means is not equal to 0
+	95 percent confidence interval:
+	-0.1214496  0.3238637
+	sample estimates:
+	mean of x   mean of y 
+	0.02039632 -0.08081075 
+	
+	> t.test(predict(glm.mod3, data=testSet),testSet$mpg)
+	
+	Welch Two Sample t-test
+	
+	data:  predict(glm.mod3, data = testSet) and testSet$mpg
+	t = 0.91084, df = 118.9, p-value = 0.3642
+	alternative hypothesis: true difference in means is not equal to 0
+	95 percent confidence interval:
+	-0.1188117  0.3212259
+	sample estimates:
+	mean of x   mean of y 
+	0.02039632 -0.08081075  
+	\end{lstlisting}
+	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+	%%%%%%   question 2
+	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+	\section{Solution to question 2}
+	\lstset{language=R}
+	\lstset{frame=lines}
+	\lstset{label={lst:code_direct}}
+	\lstset{basicstyle=\footnotesize\ttfamily}
+	\begin{lstlisting}[breaklines=true]
+	cancerData <- read.table("Cancer.txt",header=T,sep="")
+	# useful data extraction
+	usefulData = cancerData[, c("Radius","Texture","Perimeter","Area","Smooth","Compact","Concavity","Concave","Symmetry","Fractal")]
+	predictors = names(usefulData)
+	# Standardized the values
+	means = lapply(usefulData, mean)
+	sd = lapply(usefulData, sd)
+	usefulData = (usefulData - means) / sd
+	#featData = usefulData
+	usefulData[, "Diagnostic"] = cancerData[, "Diagnostic"]
+	summary(usefulData)
+	attach(usefulData)
+	
+	# perform logistic regression
+	glm.mod <- glm(Diagnostic~., data=usefulData, family=binomial)
+	summary(glm.mod)
+	# most important value is "texture"
+	
+	glm.mod <- glm(Diagnostic~Texture, data=usefulData, family=binomial)
+	summary(glm.mod)
+	glm.probs <- predict(glm.mod, type="response")
+	glm.pred = rep("B",dim(usefulData)[1])
+	glm.pred[glm.probs >.5] = "M"
+	table(glm.pred,Diagnostic)
+	mean(glm.pred==Diagnostic)
+	\end{lstlisting}
+	From the summary result, below. The most important value is "texture". And the error rate is 1-0.7047452=0.2952548.\\ 
+	\lstset{language=R}
+	\lstset{frame=lines}
+	\lstset{label={lst:code_direct}}
+	\lstset{basicstyle=\footnotesize\ttfamily}
+	\begin{lstlisting}[breaklines=true]
+	Call:
+	glm(formula = Diagnostic ~ ., family = binomial, data = usefulData)
+	
+	Deviance Residuals: 
+	Min        1Q    Median        3Q       Max  
+	-1.95590  -0.14839  -0.03943   0.00429   2.91690  
+	
+	Coefficients:
+	Estimate Std. Error z value Pr(>|z|)    
+	(Intercept)  0.48702    0.56432   0.863   0.3881    
+	Radius      -7.22185   13.09494  -0.551   0.5813    
+	Texture      1.65476    0.27758   5.961  2.5e-09 ***
+	Perimeter   -1.73763   12.27499  -0.142   0.8874    
+	Area        14.00485    5.89090   2.377   0.0174 *  
+	Smooth       1.07495    0.44942   2.392   0.0168 *  
+	Compact     -0.07723    1.07434  -0.072   0.9427    
+	Concavity    0.67512    0.64733   1.043   0.2970    
+	Concave      2.59287    1.10701   2.342   0.0192 *  
+	Symmetry     0.44626    0.29143   1.531   0.1257    
+	Fractal     -0.48248    0.60406  -0.799   0.4244    
+	---
+	Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+	
+	(Dispersion parameter for binomial family taken to be 1)
+	
+	Null deviance: 751.44  on 568  degrees of freedom
+	Residual deviance: 146.13  on 558  degrees of freedom
+	AIC: 168.13
+	
+	Number of Fisher Scoring iterations: 9
+	
+	
+	> glm.probs <- predict(glm.mod, type="response")
+	> glm.pred = rep("B",dim(usefulData)[1])
+	> glm.pred[glm.probs >.5] = "M"
+	> table(glm.pred,Diagnostic)
+	Diagnostic
+	glm.pred   B   M
+	B 310 121
+	M  47  91
+	> mean(glm.pred==Diagnostic)
+	[1] 0.7047452
+	\end{lstlisting}
+	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+	%%%%%%   question 3
+	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+	\section{Solution to question 3}
+	\lstset{language=R}
+	\lstset{frame=lines}
+	\lstset{label={lst:code_direct}}
+	\lstset{basicstyle=\footnotesize\ttfamily}
+	\begin{lstlisting}[breaklines=true]
+	> vertebralData <- read.table("VertebralData.2C.txt",header=T,sep=",")
+	> usefulData = vertebralData[, c("Incidence", "Tilt", "Angle", "Slope", "Radius", "Degree")]
+	> predictors = names(usefulData)
+	> means = lapply(usefulData, mean)
+	> sd = lapply(usefulData, sd)
+	> usefulData = (usefulData - means) / sd
+	> usefulData[, "Status"] = vertebralData[, "Status"]
+	> summary(usefulData)
+	Incidence            Tilt             Angle        
+	Min.   :-1.9928   Min.   :-2.4078   Min.   :-2.0443
+	1st Qu.:-0.8161   1st Qu.:-0.6870   1st Qu.:-0.8047
+	Median :-0.1048   Median :-0.1184   Median :-0.1277
+	Mean   : 0.0000   Mean   : 0.0000   Mean   : 0.0000
+	3rd Qu.: 0.7183   3rd Qu.: 0.4574   3rd Qu.: 0.5966
+	Max.   : 4.0227   Max.   : 3.1862   Max.   : 3.9782
+	Slope                Radius              Degree             
+	Min.   :-2.20418  Min.   :-3.5922   Min.   :-0.9946
+	1st Qu.:-0.71569  1st Qu.:-0.5415   1st Qu.:-0.6574
+	Median :-0.04089  Median : 0.0261   Median :-0.3868
+	Mean   : 0.00000  Mean   : 0.0000   Mean   : 0.0000
+	3rd Qu.: 0.72577  3rd Qu.: 0.5667   3rd Qu.: 0.3991
+	Max.   : 5.84632  Max.   : 3.3903   Max.   :10.4435
+	Status           
+	Abnormal:210     
+	Normal  :100  
+	> attach(usefulData)
+	> glm.mod <- glm(Status~Incidence+Tilt+Angle+Slope+Radius+Degree, data=usefulData, family=binomial)
+	> summary(glm.mod)
+	
+	Call:
+	glm(formula = Status ~ Incidence + Tilt + Angle + Slope + Radius + 
+	Degree, family = binomial, data = usefulData)
+	
+	Deviance Residuals: 
+	Min       1Q   Median       3Q      Max  
+	-2.2678  -0.3639  -0.0289   0.4081   2.7317  
+	
+	Coefficients:
+	Estimate Std. Error z value Pr(>|z|)    
+	(Intercept) -3.216e+00  4.803e-01  -6.696 2.14e-11 ***
+	Incidence    4.339e+08  6.923e+08   0.627    0.531    
+	Tilt        -2.520e+08  4.020e+08  -0.627    0.531    
+	Angle        3.329e-01  4.248e-01   0.784    0.433    
+	Slope       -3.379e+08  5.392e+08  -0.627    0.531    
+	Radius       1.434e+00  3.087e-01   4.645 3.39e-06 ***
+	Degree      -6.357e+00  8.770e-01  -7.248 4.23e-13 ***
+	---
+	Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+	
+	(Dispersion parameter for binomial family taken to be 1)
+	
+	Null deviance: 389.86  on 309  degrees of freedom
+	Residual deviance: 177.87  on 303  degrees of freedom
+	AIC: 191.87
+	
+	Number of Fisher Scoring iterations: 8
+	
+	> glm.probs <- predict(glm.mod, type="response")
+	> contrasts(Status)
+	Normal
+	Abnormal      0
+	Normal        1
+	> glm.pred = rep("Abnormal",dim(usefulData)[1])
+	> glm.pred[glm.probs >.5] = "Normal"
+	> table(glm.pred,Status)
+	Status
+	glm.pred   Abnormal Normal
+	Abnormal      186     23
+	Normal         24     77
+	> mean(glm.pred==Status)
+	[1] 0.8483871
+	
+	> library(MASS)
+	> lda.mod=lda(Status~Incidence+Tilt+Angle+Slope+Radius+Degree, data=usefulData)
+	Warning message:
+	In lda.default(x, grouping, ...) : variables are collinear
+	> summary(lda.mod)
+	Length Class  Mode     
+	prior    2     -none- numeric  
+	counts   2     -none- numeric  
+	means   12     -none- numeric  
+	scaling  6     -none- numeric  
+	lev      2     -none- character
+	svd      1     -none- numeric  
+	N        1     -none- numeric  
+	call     3     -none- call     
+	terms    3     terms  call     
+	xlevels  0     -none- list     
+	> lda.probs <- predict(lda.mod, type="response")
+	> lda.pred = unlist(lda.probs[1])
+	> table(lda.pred,Status)
+	Status
+	lda.pred   Abnormal Normal
+	Abnormal      193     27
+	Normal         17     73
+	> mean(lda.pred==Status)
+	[1] 0.8580645
+	\end{lstlisting}
+	Predict the variable Status suing logistic regression and LDA are shown in the code above. The correct rate is used to evaluate these two models. The one using logistic regression has the correct rate 0.8483871. While LDA shows a higher correct rate 0.8580645.\\
+	% --------------------------------------------------------------
+	%     You don't have to mess with anything below this line.
+	% --------------------------------------------------------------
+	
+\end{document}
