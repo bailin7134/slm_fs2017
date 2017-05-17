@@ -41,7 +41,7 @@ glm.mod3 <- glm(mpg~poly(weight,2), data=trainSet)
 summary(glm.mod1)
 summary(glm.mod2)
 summary(glm.mod3)
-t.test(predict(glm.mod1, data=testSet),testSet$mpg,paried=T)
+t.test(predict(glm.mod1, data=testSet),testSet$mpg)
 t.test(predict(glm.mod2, data=testSet),testSet$mpg)
 t.test(predict(glm.mod3, data=testSet),testSet$mpg)
 
